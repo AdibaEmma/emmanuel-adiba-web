@@ -3,14 +3,14 @@ export const siteConfig = {
   title: 'Software Engineer · Ghana',
   description:
     'Software engineer in Bolgatanga, Ghana. Client products at Global Tech Network, founder of Portforge Technologies, and a small ML/AI lab on the side.',
-  url: 'https://emmanuel-adiba.vercel.app',
+  url: 'https://emmanueladiba.com',
   email: 'eabaagah@gmail.com',
   phone: ['+233556137400'],
   location: 'Bolgatanga, Upper East — Ghana',
   // Business enquiries go to the company site; this one is the personal record.
   portforge: {
     name: 'Portforge Technologies',
-    url: 'https://portforge-web-production.up.railway.app',
+    url: 'https://portforgetechnologies.com',
   },
   sourceUrl: 'https://github.com/AdibaEmma/emmanuel-adiba-web',
   social: {
