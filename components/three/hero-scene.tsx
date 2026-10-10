@@ -25,7 +25,7 @@ import {
   Suspense,
   useCallback,
 } from "react";
-import type { ReactNode } from "react";
+import type { ReactNode, RefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Float, Html } from "@react-three/drei";
 import {
@@ -35,10 +35,10 @@ import {
 } from "@react-three/postprocessing";
 import * as THREE from "three";
 import { PILLARS, pillarUppercase, type Pillar } from "@/lib/brand";
+import { PillarDiagram } from "@/components/three/pillar-diagram";
 
 const ACCENT = "#C7F65E";
 const INK = "#F5F1E6";
-const VOID = "#0A0B0A";
 
 const PARTICLE_COUNT = 90;
 const PARTICLE_INNER_RADIUS = 2.6;
@@ -437,112 +437,6 @@ function Scene({ onVertexClick, focusedPillar }: SceneProps) {
   );
 }
 
-// ─── Static SVG fallback (reduced motion / mobile) ───────────────────────────
-function StaticFallback({ onVertexClick }: SceneProps) {
-  const verts2D: Array<[number, number]> = [
-    [200, 90],
-    [110, 240],
-    [290, 240],
-    [200, 195],
-  ];
-  const interactive = !!onVertexClick;
-  return (
-    <div
-      style={{
-        position: "absolute",
-        inset: 0,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        pointerEvents: interactive ? "auto" : "none",
-      }}
-    >
-      <svg
-        viewBox="0 0 400 320"
-        width="80%"
-        height="80%"
-        style={{ maxWidth: 520 }}
-      >
-        <defs>
-          <radialGradient id="vertGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor={ACCENT} stopOpacity="1" />
-            <stop offset="60%" stopColor={ACCENT} stopOpacity="0.2" />
-            <stop offset="100%" stopColor={ACCENT} stopOpacity="0" />
-          </radialGradient>
-        </defs>
-
-        {[
-          [0, 1],
-          [0, 2],
-          [0, 3],
-          [1, 2],
-          [1, 3],
-          [2, 3],
-        ].map(([a, b], i) => (
-          <line
-            key={i}
-            x1={verts2D[a][0]}
-            y1={verts2D[a][1]}
-            x2={verts2D[b][0]}
-            y2={verts2D[b][1]}
-            stroke={ACCENT}
-            strokeOpacity="0.5"
-            strokeWidth="1"
-          />
-        ))}
-
-        {verts2D.map((v, i) => {
-          const pillar = PILLARS[i];
-          return (
-            <g
-              key={i}
-              role={interactive ? "button" : undefined}
-              aria-label={interactive ? `Open ${pillarUppercase(pillar)}` : undefined}
-              tabIndex={interactive ? 0 : -1}
-              onClick={interactive ? () => onVertexClick?.(pillar) : undefined}
-              onKeyDown={
-                interactive
-                  ? (e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        onVertexClick?.(pillar);
-                      }
-                    }
-                  : undefined
-              }
-              style={{ cursor: interactive ? "pointer" : "default", outline: "none" }}
-            >
-              {/* Larger transparent hit target */}
-              <circle
-                cx={v[0]}
-                cy={v[1]}
-                r="32"
-                fill="transparent"
-                pointerEvents="all"
-              />
-              <circle cx={v[0]} cy={v[1]} r="20" fill="url(#vertGlow)" />
-              <circle cx={v[0]} cy={v[1]} r="4" fill={ACCENT} />
-              <text
-                x={v[0]}
-                y={v[1] - 24}
-                fill={INK}
-                fontSize="9"
-                fontFamily="ui-monospace, monospace"
-                textAnchor="middle"
-                letterSpacing="2"
-              >
-                {pillarUppercase(pillar).slice(0, 3)}
-              </text>
-            </g>
-          );
-        })}
-
-        <rect width="400" height="320" fill={VOID} fillOpacity="0" />
-      </svg>
-    </div>
-  );
-}
-
 // ─── Hooks ───────────────────────────────────────────────────────────────────
 function useReducedMotion() {
   const [reduced, setReduced] = useState(false);
@@ -556,22 +450,27 @@ function useReducedMotion() {
   return reduced;
 }
 
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(false);
+/** True while any part of the element is on screen. */
+function useInView(ref: RefObject<HTMLElement | null>) {
+  const [inView, setInView] = useState(true);
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth < 768);
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
-  return isMobile;
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => setInView(entry.isIntersecting));
+    io.observe(el);
+    return () => io.disconnect();
+  }, [ref]);
+  return inView;
 }
 
 // ─── Main export ─────────────────────────────────────────────────────────────
 export function HeroScene({ onVertexClick, focusedPillar }: SceneProps) {
   const reduced = useReducedMotion();
-  const isMobile = useIsMobile();
   const [mounted, setMounted] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  // The particle network recomputes ~4k distance checks a frame; there is no
+  // reason to pay for that while the hero is scrolled out of view.
+  const inView = useInView(wrapperRef);
 
   useEffect(() => setMounted(true), []);
 
@@ -581,44 +480,35 @@ export function HeroScene({ onVertexClick, focusedPillar }: SceneProps) {
     [onVertexClick],
   );
 
-  if (!mounted || reduced || isMobile) {
-    return (
-      <div
-        style={{
-          position: "relative",
-          width: "100%",
-          height: "100%",
-          minHeight: 400,
-        }}
-      >
-        <StaticFallback onVertexClick={handleClick} />
-      </div>
-    );
-  }
-
+  // The hero only mounts this scene from the md breakpoint up; small screens
+  // get the in-flow PillarDiagram instead. The wrapper is shared by both
+  // branches so the visibility observer is attached from the first render.
   return (
-    <div
-      style={{
-        position: "relative",
-        width: "100%",
-        height: "100%",
-        minHeight: 500,
-      }}
-    >
-      <Canvas
-        gl={{
-          antialias: true,
-          alpha: true,
-          powerPreference: "high-performance",
-        }}
-        dpr={[1, 2]}
-        camera={{ position: [0, 0, CAMERA_REST_Z], fov: 32 }}
-        style={{ background: "transparent" }}
-      >
-        <Suspense fallback={null}>
-          <Scene onVertexClick={handleClick} focusedPillar={focusedPillar} />
-        </Suspense>
-      </Canvas>
+    <div ref={wrapperRef} className="relative h-full w-full min-h-[400px] md:min-h-[500px]">
+      {!mounted || reduced ? (
+        <div className="absolute inset-0 flex items-center justify-center text-[var(--foreground)]">
+          <PillarDiagram
+            onVertexClick={handleClick}
+            className="w-[80%] h-[80%] max-w-[520px]"
+          />
+        </div>
+      ) : (
+        <Canvas
+          gl={{
+            antialias: true,
+            alpha: true,
+            powerPreference: "high-performance",
+          }}
+          dpr={[1, 2]}
+          frameloop={inView ? "always" : "never"}
+          camera={{ position: [0, 0, CAMERA_REST_Z], fov: 32 }}
+          style={{ background: "transparent" }}
+        >
+          <Suspense fallback={null}>
+            <Scene onVertexClick={handleClick} focusedPillar={focusedPillar} />
+          </Suspense>
+        </Canvas>
+      )}
     </div>
   );
 }

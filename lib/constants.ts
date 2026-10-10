@@ -2,14 +2,20 @@ export const siteConfig = {
   name: 'Emmanuel Adiba',
   title: 'Software Engineer · Ghana',
   description:
-    'Software engineer building resilient, distributed systems — from fintech and trading engines to commerce and travel platforms. Currently exploring the seam between engineering, ML/AI, and human cognition.',
+    'Software engineer in Bolgatanga, Ghana. Client products at Global Tech Network, founder of Portforge Technologies, and a small ML/AI lab on the side.',
   url: 'https://emmanuel-adiba.vercel.app',
   email: 'eabaagah@gmail.com',
   phone: ['+233556137400'],
   location: 'Bolgatanga, Upper East — Ghana',
+  // Business enquiries go to the company site; this one is the personal record.
+  portforge: {
+    name: 'Portforge Technologies',
+    url: 'https://portforge-web-production.up.railway.app',
+  },
+  sourceUrl: 'https://github.com/AdibaEmma/emmanuel-adiba-web',
   social: {
     twitter: 'https://www.twitter.com/emmanuel_adiba',
-    linkedin: 'https://www.linkedin.com/in/adiba-emmanuel/',
+    linkedin: 'https://www.linkedin.com/in/emmanuel-adiba/',
     facebook: 'https://www.facebook.com/adiba.emmanuel.5',
     github: 'https://www.github.com/AdibaEmma',
   },
@@ -29,6 +35,7 @@ export const skills = {
   languages: [
     { name: 'TypeScript', icon: 'devicon-typescript-plain' },
     { name: 'JavaScript', icon: 'devicon-javascript-plain' },
+    { name: 'PHP', icon: 'devicon-php-plain' },
     { name: 'Java', icon: 'devicon-java-plain' },
     { name: 'Kotlin', icon: 'devicon-kotlin-plain' },
     { name: 'Python', icon: 'devicon-python-plain' },
@@ -43,6 +50,7 @@ export const skills = {
     { name: 'Node.js', icon: 'devicon-nodejs-plain' },
     { name: 'NestJS', icon: 'devicon-nestjs-plain' },
     { name: 'Express', icon: 'devicon-express-original' },
+    { name: 'Laravel', icon: 'devicon-laravel-plain' },
     { name: 'Spring Boot', icon: 'devicon-spring-plain' },
     { name: 'Hibernate', icon: 'devicon-hibernate-plain' },
     { name: 'Spring Cloud', icon: 'devicon-spring-plain' },
@@ -82,15 +90,29 @@ export const skills = {
 }
 
 /**
- * Project type — every entry MUST carry `pillars` (one or more) and `role`
- * (precise ownership language). See lib/brand.ts for the canonical pillar list.
+ * Project type — every entry MUST carry `pillars` (one or more), `role`
+ * (precise ownership language) and `status` (where it stands today).
+ * See lib/brand.ts for the canonical pillar list.
  *
  * Ownership language rules:
- *   GTN client work → "Lead Engineer at GTN" / "Engineer at GTN" — never "I built", "my product"
+ *   GTN client work → "Engineer at GTN" — never "I built", "my product".
+ *                     The title on every CV is Software Developer; what was
+ *                     led goes in the description, not the role.
  *   Builder work    → "Solo build"
- *   Founder work    → "Founder & Engineer" / "Co-founder & CTO"
+ *   Founder work    → "Founder & Engineer"
+ *
+ * This site describes the contribution and the technical decisions. The
+ * customer problem and business case for Portforge products live on the
+ * Portforge site — link there rather than restating it.
  */
 import type { Pillar } from './brand'
+
+export type ProjectLink = {
+  href: string
+  /** Visible destination, e.g. "geardockgh.com" or "GitHub". */
+  label: string
+  kind: 'live' | 'repo'
+}
 
 export type Project = {
   id: string
@@ -100,14 +122,16 @@ export type Project = {
   technologies: string[]
   pillars: Pillar[]
   role: string
-  // Legacy category — kept for back-compat in code paths that still reference it.
-  category?: string
+  /** The company the work belongs to, when it is not the person. */
+  venture?: string
   year: string
+  /** Where it stands today, in a few words. */
+  status: string
   image: string
-  imageSecondary?: string
-  liveUrl?: string
-  githubUrl?: string
+  /** Absent when the work is private or unpublished — the card says so instead. */
+  link?: ProjectLink
   featured: boolean
+  /** Substantiated facts only. */
   impact: string
 }
 
@@ -116,158 +140,145 @@ export const projects: Project[] = [
   {
     id: 'geardockgh',
     title: 'GearDockGH',
-    tagline: 'Your Setup. Your Edge.',
+    tagline: 'Technology retail for the Upper East.',
     description:
-      "Solo venture, in production. An e-commerce platform delivering premium imported gear to Ghana's remote workers, creators, and gamers — verified, priced in cedis, at the door in 48 hours. Self-hosted on Hetzner.",
-    technologies: ['Next.js', 'TypeScript', 'NestJS', 'PostgreSQL', 'Stripe', 'Hetzner'],
+      "Designed and built the storefront and its API. Stock state is a first-class field: in-stock items promise 48-hour delivery in Bolgatanga, pre-orders state their wait before payment. Prices are quoted in cedis with delivery included, and payments go through Paystack — card, mobile money and bank transfer — behind signed webhooks, so every sale leaves a record on both sides. Landed costs come from ImportBrain through an integration API.",
+    technologies: ['Next.js', 'NestJS', 'Prisma', 'PostgreSQL', 'BullMQ', 'Paystack'],
     pillars: ['founder'],
     role: 'Founder & Engineer',
-    category: 'fullstack',
-    githubUrl: '',
-    liveUrl: 'https://geardockgh.com',
+    venture: 'Portforge Technologies',
+    year: '2026',
+    status: 'Live',
+    link: { href: 'https://geardockgh.com', label: 'geardockgh.com', kind: 'live' },
     image: '/images/works/geardockgh.png',
     featured: true,
-    impact: '50+ orders · 10 categories · 48h delivery',
-    year: '2025',
+    impact: 'Live · taking and delivering orders in Bolgatanga',
   },
   {
     id: 'importbrain',
     title: 'ImportBrain',
-    tagline: 'The cedi moved. Do you know your margins?',
+    tagline: 'Landed cost and margin for Ghana’s importers.',
     description:
-      "Solo SaaS venture. The operating system for Ghana's mini-importers — shipments, suppliers, FX tracking, cedi flow, all in one command centre. Replaces spreadsheets and prayer with a real margin engine.",
-    technologies: ['Next.js', 'TypeScript', 'NestJS', 'PostgreSQL', 'Redis', 'Recharts'],
+      'Built the multi-tenant web app and API. The batch, not the product, is the central record: goods, freight, duty and handling attach to a shipment and divide down to a per-unit landed cost in cedis. Exchange rates are stored against the transaction that paid them — the live rate is shown for context and never used in a historical figure. Billing runs on Paystack, with a founder plan capped at 20 accounts.',
+    technologies: ['Next.js', 'NestJS', 'Prisma', 'PostgreSQL', 'Recharts', 'Paystack'],
     pillars: ['founder'],
     role: 'Founder & Engineer',
-    category: 'fullstack',
-    githubUrl: '',
-    liveUrl: 'https://importbrain.app',
+    venture: 'Portforge Technologies',
+    year: '2026',
+    status: 'Early access',
+    link: { href: 'https://importbrain.net', label: 'importbrain.net', kind: 'live' },
     image: '/images/works/importbrain-dashboard.png',
-    imageSecondary: '/images/works/importbrain-landing.png',
     featured: true,
-    impact: 'FX tracking · ROI engine · live cedi quotes',
-    year: '2025',
+    impact: 'Built from Mar 2026 · paid plans opened Oct 2026',
   },
   {
     id: 'wayve',
     title: 'Wayve',
-    tagline: 'Plan Ghana together. Travel in flow.',
+    tagline: 'Plan Ghana together.',
     description:
-      'Pre-seed venture, co-founded as CTO at Zurelix Limited. A calm AI travel companion for all 16 regions of Ghana — discover authentic places, plan with friends, split expenses fairly, keep every memory.',
-    technologies: ['Next.js', 'TypeScript', 'OpenAI', 'PostgreSQL', 'Vector Search'],
+      'Founder and sole engineer of a group-trip platform: a shared workspace for each trip — itinerary, participants, split expenses and photos — on top of a discovery catalogue that spans all 16 regions of Ghana. A NestJS API serves a Next.js web app and an Expo mobile app. The assistant is an LLM chat with a structured intent router rather than open-ended tool calling. A separate venture from Portforge.',
+    technologies: ['Next.js', 'NestJS', 'TypeORM', 'PostgreSQL', 'Expo', 'OpenAI'],
     pillars: ['founder'],
-    role: 'Co-founder & CTO',
-    category: 'fullstack',
-    githubUrl: '',
-    liveUrl: 'https://wayve.app',
+    role: 'Founder & Engineer',
+    year: '2026',
+    status: 'Early beta',
+    link: { href: 'https://joinwayve.com', label: 'joinwayve.com', kind: 'live' },
     image: '/images/works/wayve.png',
     featured: true,
-    impact: 'AI companion · 16 regions · group planning',
-    year: '2025',
+    impact: 'Early beta · web and mobile',
   },
 
   // ── ENGINEER (GTN client work — I am NOT the owner) ─────────────────────
   {
     id: 'itargetgolf',
     title: 'iTargetGolf',
-    tagline: 'Hole-in-one tournaments, online.',
+    tagline: 'Golf tournament platform.',
     description:
-      "Lead engineer at GTN LLC on iTargetGolf — a tournament platform that brings real-money hole-in-one contests online. Houses Cash Cup Golf and other tournament formats, with Stripe Connect for payouts, React Native for the player app, and NestJS + Prisma on the back end.",
-    technologies: ['NestJS', 'React Native', 'Stripe Connect', 'Prisma', 'PostgreSQL'],
+      'Client work at Global Tech Network on the Cash Cup Golf platform behind iTargetGolf — a Laravel 10 application with Stripe payments and Twilio messaging. The product and its story belong to the client.',
+    technologies: ['Laravel', 'PHP', 'Stripe', 'Twilio'],
     pillars: ['engineer'],
-    role: 'Lead Engineer at GTN',
-    category: 'fullstack',
+    role: 'Engineer at GTN',
+    year: '2026',
+    status: 'Client product · not publicly linked',
     image: '/images/works/itargetgolf.png',
     featured: true,
-    impact: 'Client product · GTN LLC · Cash Cup Golf live',
-    year: '2024 →',
+    impact: 'Client product · GTN LLC',
   },
   {
     id: 'vacation-branson',
     title: 'Vacation Branson',
-    tagline: '4-day, 3-night Ozarks packages.',
+    tagline: 'Vacation packages and show tickets in Branson, Missouri.',
     description:
-      'Lead engineer at GTN on Vacation Branson — a vacation package marketplace bundling hotel stays with show tickets and local attractions in Branson, Missouri. Resort partnerships, Stripe Connect payouts, ACH, and a host-operations dashboard, all on NestJS + React + Prisma.',
-    technologies: ['NestJS', 'React', 'Stripe Connect', 'ACH', 'Prisma', 'PostgreSQL'],
+      'Client work at Global Tech Network. Lead engineering on a multi-product Laravel codebase that serves Vacation Branson and Branson Show Tickets.',
+    technologies: ['Laravel', 'PHP', 'OpenAI', 'AWS S3'],
     pillars: ['engineer'],
-    role: 'Lead Engineer at GTN',
-    category: 'fullstack',
+    role: 'Engineer at GTN',
+    year: '2026',
+    status: 'Client product · not publicly linked',
     image: '/images/works/vacation-branson.png',
     featured: false,
-    impact: 'Client product · GTN LLC · resort partnerships live',
-    year: '2024 →',
+    impact: 'Client product · GTN LLC',
   },
   {
     id: 'compliance-scorecard',
     title: 'Compliance Scorecard',
-    tagline: 'SaaS governance for MSPs.',
+    tagline: 'Governance software for MSPs.',
     description:
-      "Engineer on the GTN client team for Compliance Scorecard — the SaaS governance program for MSPs. Currently crafting an MCP server so the assistant can reason against the live compliance graph instead of a static export.",
-    technologies: ['Laravel', 'NestJS', 'MCP', 'PostgreSQL', 'TypeScript'],
+      'Client work at Global Tech Network on a Laravel back end and React front end, and on its MCP server — so an assistant can query live compliance data instead of a static export.',
+    technologies: ['Laravel', 'React', 'MCP', 'PHP'],
     pillars: ['engineer'],
     role: 'Engineer at GTN',
-    category: 'backend',
+    year: '2024 →',
+    status: 'Client product · not publicly linked',
     image: '/images/works/compliance-scorecard.png',
     featured: false,
-    impact: 'Client product · GTN LLC · MCP server in flight',
-    year: '2025',
+    impact: 'Client product · GTN LLC',
   },
 
-  // ── BUILDER (exploratory; no venture intent) ────────────────────────────
+  // ── BUILDER (side builds — unreleased) ──────────────────────────────────
   {
     id: 'bookloop',
     title: 'BookLoop',
-    tagline: 'What if libraries had a book DM?',
+    tagline: 'Find and swap books nearby.',
     description:
-      "Solo build. A peer-to-peer book lending experiment with social DMs around each title. Done for the craft of mapping social graphs onto inventory — not a venture, just a question I wanted to answer.",
-    technologies: ['Next.js', 'TypeScript', 'PostgreSQL', 'Liveblocks'],
+      'A mobile-first book exchange for Ghana: list a book to swap, donate or lend, browse listings nearby, meet at a safe spot and confirm the hand-over with a QR code. Built the NestJS API, the Expo app and a Next.js admin; each exchange runs on an explicit state machine.',
+    technologies: ['NestJS', 'TypeORM', 'PostgreSQL', 'Expo', 'Next.js', 'Paystack'],
     pillars: ['builder'],
     role: 'Solo build',
-    category: 'fullstack',
+    year: '2025',
+    status: 'MVP · not launched',
+    link: {
+      href: 'https://github.com/AdibaEmma/bookloop-api',
+      label: 'GitHub',
+      kind: 'repo',
+    },
     image: '',
     featured: false,
-    impact: 'Exploratory · no users yet',
-    year: '2024',
-  },
-  {
-    id: 'zctl',
-    title: 'ZCTL',
-    tagline: 'Zero-config CLI tooling experiments.',
-    description:
-      'Solo build. A series of small CLI experiments around config-less developer tooling — turning the friction of setup into a single command. Half-shipped, half-archived, all teaching.',
-    technologies: ['TypeScript', 'Bun', 'oclif', 'Node'],
-    pillars: ['builder'],
-    role: 'Solo build',
-    category: 'devtools',
-    image: '',
-    featured: false,
-    impact: 'Exploratory · craft work',
-    year: '2024',
+    impact: 'Unreleased · source public on GitHub',
   },
   {
     id: 'slampact',
     title: 'SlamPact',
-    tagline: 'Group goal-setting with social stakes.',
+    tagline: 'Reviews that turn into donations.',
     description:
-      'Solo build. An experiment in group goal-setting where missing your stake costs you the room. Built to learn betting market design and group-state coordination — no plan to monetize.',
-    technologies: ['Next.js', 'TypeScript', 'PostgreSQL', 'Stripe'],
+      'A review platform from the Upper East: verified reviews of local institutions and businesses, with each review translating into a charitable contribution. Built the API, the web and admin apps and an Expo mobile app, seeded with Bolgatanga entities.',
+    technologies: ['NestJS', 'Prisma', 'Supabase', 'React', 'Expo', 'Paystack'],
     pillars: ['builder'],
     role: 'Solo build',
-    category: 'fullstack',
+    year: '2025',
+    status: 'Unreleased · private repositories',
     image: '',
     featured: false,
-    impact: 'Exploratory · learning project',
-    year: '2024',
+    impact: 'Unreleased · no public demo',
   },
 ]
 
 // All entries are noun phrases so the label "(Currently) X" reads grammatically.
 export const roles = [
   'Software Engineer',
-  'Distributed Systems Builder',
-  'Backend Architect',
-  'ML/AI Practitioner',
+  'Backend Engineer',
   'Product Engineer',
+  'ML/AI Learner',
   'Founder',
 ]
 
@@ -285,7 +296,7 @@ export const journey = [
     chapter: 'Chapter 01',
     chapterLabel: 'Foundations',
     summary:
-      'Studied computer engineering — software, systems, signal processing. Wrote my first line of production code for fellow students; finished a web app as the final-year project.',
+      'Studied computer engineering — software, systems, signal processing — and finished with a web application as the final-year project.',
     bullets: [
       'Specialized in software engineering and system design',
       'Shipped small web projects for fellow students',
@@ -305,11 +316,11 @@ export const journey = [
     chapter: 'Chapter 02',
     chapterLabel: 'Going deep',
     summary:
-      'Two formative years on the JVM — Kotlin, Java, Spring Boot — building real-time systems and a microservice trading engine that moved real revenue.',
+      'Two formative years on the JVM — Kotlin, Java, Spring Boot — building real-time systems and a microservice trading engine.',
     bullets: [
-      'Built a real-time tech news aggregator on Kotlin / Spring Boot / PostgreSQL serving 15,000+ users',
-      'Owned the schema design and migration story end-to-end — DrawIO for diagrams, Flyway for production rollouts',
-      'Engineered a microservice trading engine in Java + Redis that became the team\u2019s revenue spine',
+      'Built a real-time tech-news aggregator in Kotlin and Spring Boot serving 15,000+ active users',
+      'Owned schema design and migrations end to end — DrawIO for diagrams, Flyway for production rollouts',
+      'Engineered a microservice trading engine in Java and Redis, deployed in a financial-services product line',
     ],
     technologies: ['Kotlin', 'Spring Boot', 'Java', 'PostgreSQL', 'Redis', 'Flyway'],
     type_label: 'Full-time',
@@ -326,14 +337,14 @@ export const journey = [
     chapter: 'Chapter 03',
     chapterLabel: 'Leading delivery',
     summary:
-      'Coordinated cross-functional delivery on a CRM platform. First taste of running a project end-to-end — leadership, scope, documentation, ship dates.',
+      'Part-time, alongside Turntabl. Coordinated delivery on a CRM platform — a first run at a project end to end: scope, documentation, ship dates.',
     bullets: [
-      'Coordinated cross-functional delivery on the CRM platform — shipped the v1 release ahead of plan',
-      'Designed and shipped the engagement-loop feature that became the team\u2019s default daily-driver workflow',
-      'Established the documentation playbook the team still uses; replaced status meetings with async updates',
+      'Coordinated a cross-functional team on the CRM platform and shipped ahead of schedule',
+      'Built engagement features for the CRM’s users',
+      'Introduced written, asynchronous updates in place of most status meetings',
     ],
     technologies: ['Java', 'Spring Boot', 'PostgreSQL', 'React', 'Docker'],
-    type_label: 'Full-time',
+    type_label: 'Part-time',
   },
   {
     id: 'sendafrika',
@@ -347,11 +358,11 @@ export const journey = [
     chapter: 'Chapter 04',
     chapterLabel: 'Fintech, in motion',
     summary:
-      "A short, intense fintech sprint — KYC and authentication for SendAfrika's flagship product. NestJS, MongoDB, money on the wire.",
+      "A four-month fintech contract — authentication, KYC and onboarding for SendAfrika's product on NestJS and MongoDB.",
     bullets: [
-      "Built authentication and KYC modules for SendAfrika's flagship product on NestJS + MongoDB",
-      'Delivered the full onboarding flow in a six-week sprint — single-session verification, no multi-day handoffs',
-      'Authored the testing and documentation conventions the team adopted across services',
+      "Built the authentication and KYC modules for SendAfrika's product on NestJS and MongoDB",
+      'Delivered the onboarding flow for the MVP',
+      'Wrote the testing and documentation conventions used across its services',
     ],
     technologies: ['NestJS', 'MongoDB', 'TypeScript', 'JWT', 'KYC APIs'],
     type_label: 'Contract',
@@ -366,36 +377,37 @@ export const journey = [
     org: 'Global Tech Network',
     location: 'Orlando, FL · Remote',
     chapter: 'Chapter 05',
-    chapterLabel: 'Today',
+    chapterLabel: 'Client products',
     summary:
-      'Leading the OITs Web project — React, NestJS, MySQL, WebSockets. Building real-time UX, hardening engineering practices, and shipping more in less time.',
+      'Client products for a US software firm, from Ghana — React and NestJS first, then a run of Laravel platforms with payments at their centre.',
     bullets: [
-      'Lead engineer on OITs Web — React, NestJS, MySQL, WebSockets — releases on a predictable bi-weekly cadence',
-      'Refactored Stripe Connect across Card, ACH, and Check into a SOLID service layer; deferred-transfer logic now prevents premature affiliate payouts',
-      'Crafting an MCP server for Compliance Scorecard so the assistant reasons over the live compliance graph, not a static export',
+      "Built OIT's web platform on React, NestJS, MySQL and WebSockets",
+      'Lead engineering on the Vacation Branson / Branson Show Tickets Laravel codebase, with one direct report',
+      'Refactored Fortiffi’s Stripe Connect payments (card, ACH, check) into a service layer that defers transfers until final payment',
+      'Building the MCP server for Compliance Scorecard',
     ],
-    technologies: ['React', 'NestJS', 'MySQL', 'WebSockets', 'TypeScript'],
+    technologies: ['Laravel', 'React', 'NestJS', 'MySQL', 'Stripe Connect', 'MCP'],
     type_label: 'Remote',
   },
   {
     id: 'founder',
     type: 'work' as const,
-    period: '2025 — Present',
-    yearStart: 2025,
+    period: '2026 — Present',
+    yearStart: 2026,
     yearEnd: null,
     title: 'Founder · Engineer',
-    org: 'Independent — GearDockGH · ImportBrain · Wayve',
-    location: 'Ghana',
+    org: 'Portforge Technologies · Wayve',
+    location: 'Bolgatanga, Ghana',
     chapter: 'Chapter 06',
     chapterLabel: 'Building things I want to exist',
     summary:
-      'Independently shipping products for Ghana — a verified electronics store, a mini-import command centre, and a calm AI travel companion. Engineering the things I want to exist.',
+      'Portforge Technologies, registered in Bolgatanga, runs GearDockGH and ImportBrain. Wayve is a separate venture.',
     bullets: [
-      'GearDockGH — premium imported gear, priced in cedis, delivered in 48 hours',
-      "ImportBrain — operating system for Ghana's mini-importers",
-      'Wayve — AI travel companion for all 16 regions of Ghana',
+      'GearDockGH — technology retail for the Upper East, live',
+      "ImportBrain — landed cost and margin for Ghana's importers, early access",
+      'Wayve — group-trip planning for Ghana, early beta',
     ],
-    technologies: ['Next.js', 'NestJS', 'PostgreSQL', 'OpenAI', 'TypeScript'],
+    technologies: ['Next.js', 'NestJS', 'PostgreSQL', 'Paystack', 'Expo'],
     type_label: 'Founder',
   },
 ]
@@ -412,28 +424,4 @@ export const education = {
   ],
 }
 
-// Backwards-compat alias used by some components
-export const workExperience = journey
-  .filter((j) => j.type === 'work')
-  .map((j) => ({
-    id: j.id,
-    company: j.org,
-    position: j.title,
-    location: j.location,
-    period: j.period,
-    type: j.type_label ?? 'Full-time',
-    achievements: j.bullets,
-    technologies: j.technologies,
-  }))
-
-export const aboutContent = {
-  intro: 'Engineer. Builder. Thinker. Founder.',
-  description: `Four pillars, in that order. Lead engineer at GTN LLC by day — shipping Vacation Branson, iTargetGolf, and Compliance Scorecard as client work on NestJS, Laravel, React Native, and Stripe Connect.
-
-After hours: experiments under BookLoop, ZCTL, and SlamPact — solo builds done for the craft, not for a venture. No users to serve, just questions to answer.
-
-The lab runs in parallel. Vector search for semantic resume parsing, fine-tuning Llama on Stoic philosophy, behavioral economics applied to payment UX. The seam between deterministic systems and the messy logic of human decision-making.
-
-And the ventures: GearDockGH live on Hetzner, ImportBrain in private beta, Wayve pre-seed at Zurelix Limited where I'm co-founder & CTO. More in the pipeline.`,
-  resumePath: '/files/Emmanuel_Adiba_CV.pdf',
-}
+export const resumePath = '/files/Emmanuel_Adiba_CV.pdf'

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
@@ -9,15 +9,15 @@ import {
   PILLAR_DESCRIPTION,
   type Pillar,
 } from "@/lib/brand";
-import { timeAgo, type PillarEntry } from "@/lib/pillar-log";
+import { formatMonth, type PillarEntry } from "@/lib/pillar-log";
 
 /**
  * PillarOverlay — full-screen "deep dive" for a clicked tetrahedron vertex.
  *
  * Lives on the home page above the hero. Opens when the hero scene reports
  * a vertex click via `onVertexClick`. Keeps backdrop blur, ESC handling,
- * focus trap-light (return focus to body on close), and a CTA into the
- * Pillar Log for the dated artifact.
+ * moves focus into the dialog on open and hands it back to whatever opened
+ * it on close, and a CTA into the Pillar Log for the dated artifact.
  */
 export function PillarOverlay({
   pillar,
@@ -30,9 +30,10 @@ export function PillarOverlay({
 }) {
   const reducedMotion = useReducedMotion();
 
-  // ESC closes; lock body scroll while open
+  // ESC closes; lock body scroll while open; focus in, then back out
   useEffect(() => {
     if (!pillar) return;
+    const opener = document.activeElement as HTMLElement | null;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
@@ -42,6 +43,7 @@ export function PillarOverlay({
     return () => {
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
+      opener?.focus?.();
     };
   }, [pillar, onClose]);
 
@@ -107,7 +109,8 @@ function PillarCard({
   entry: PillarEntry;
   onClose: () => void;
 }) {
-  const ago = timeAgo(entry.date);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => closeRef.current?.focus(), []);
   const isExternal = entry.href?.startsWith("http");
 
   return (
@@ -124,6 +127,7 @@ function PillarCard({
           </span>
         </div>
         <button
+          ref={closeRef}
           type="button"
           onClick={onClose}
           aria-label="Close"
@@ -159,7 +163,9 @@ function PillarCard({
       <div className="border-t border-hairline pt-8">
         <div className="flex items-baseline justify-between mb-4">
           <p className="eyebrow">— Latest evidence</p>
-          <p className="label-mono text-[var(--ink-muted)]">{ago}</p>
+          <time dateTime={entry.date} className="label-mono text-[var(--ink-muted)]">
+            {formatMonth(entry.date)}
+          </time>
         </div>
         <h3 className="font-display text-2xl md:text-3xl leading-tight">
           {entry.headline}

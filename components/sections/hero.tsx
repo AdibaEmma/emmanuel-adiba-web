@@ -5,65 +5,28 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Magnetic } from "@/components/ui/magnetic";
-import { roles } from "@/lib/constants";
-import { PILLARS, pillarUppercase, type Pillar } from "@/lib/brand";
-import { PILLAR_ENTRIES, type PillarEntry } from "@/lib/pillar-log";
+import { roles, siteConfig } from "@/lib/constants";
+import { PILLARS, PILLAR_LABEL, pillarUppercase, type Pillar } from "@/lib/brand";
+import { PILLAR_ENTRIES } from "@/lib/pillar-log";
 import { PillarOverlay } from "@/components/sections/pillar-overlay";
+import { PillarDiagram } from "@/components/three/pillar-diagram";
 
-// 3D scene only on client (heavy bundle, mouse-driven). A faint static SVG
-// is rendered while the chunk loads so we don't flash empty space.
+// 3D scene only on client (heavy bundle, mouse-driven), and only from the md
+// breakpoint up. A faint static diagram is rendered while the chunk loads so
+// we don't flash empty space.
 const HeroScene = dynamic(
   () => import("@/components/three/hero-scene").then((m) => m.HeroScene),
   {
     ssr: false,
     loading: () => (
-      <div className="absolute inset-0 flex items-center justify-center">
-        <svg
-          viewBox="0 0 400 320"
-          className="w-3/4 max-w-[420px] opacity-30"
-          aria-hidden
-        >
-          {(
-            [
-              [0, 1],
-              [0, 2],
-              [0, 3],
-              [1, 2],
-              [1, 3],
-              [2, 3],
-            ] as const
-          ).map(([a, b], i) => {
-            const v: Array<[number, number]> = [
-              [200, 90],
-              [110, 240],
-              [290, 240],
-              [200, 195],
-            ];
-            return (
-              <line
-                key={i}
-                x1={v[a][0]}
-                y1={v[a][1]}
-                x2={v[b][0]}
-                y2={v[b][1]}
-                stroke="currentColor"
-                strokeOpacity="0.35"
-                strokeWidth="1"
-                className="text-[var(--accent)]"
-              />
-            );
-          })}
-        </svg>
+      <div className="absolute inset-0 flex items-center justify-center text-[var(--foreground)] opacity-40">
+        <PillarDiagram className="w-[80%] h-[80%] max-w-[520px]" />
       </div>
     ),
   },
 );
 
-export function HeroSection({
-  engineerEntry,
-}: {
-  engineerEntry: PillarEntry;
-}) {
+export function HeroSection() {
   const [roleIdx, setRoleIdx] = useState(0);
   const [focusedPillar, setFocusedPillar] = useState<Pillar | null>(null);
   const reducedMotion = useReducedMotion();
@@ -75,15 +38,6 @@ export function HeroSection({
     }, 2800);
     return () => clearInterval(id);
   }, [reducedMotion]);
-
-  // Combine server-fetched engineer entry with the authored entries so the
-  // overlay shows live data for Engineer and authored data for the rest.
-  const overlayEntries = {
-    engineer: engineerEntry,
-    builder: PILLAR_ENTRIES.builder,
-    thinker: PILLAR_ENTRIES.thinker,
-    founder: PILLAR_ENTRIES.founder,
-  };
 
   // When reduced motion is requested, skip framer's initial offsets entirely.
   const fade = reducedMotion
@@ -98,11 +52,13 @@ export function HeroSection({
       {/* Atmospheric glow — dialed back, no longer competes with type */}
       <div className="hero-glow" aria-hidden />
 
-      {/* 3D scene — constrained to the right column, faded at the left edge so
-          it cannot bleed across the H1 typography. Pointer events live on
-          this layer so vertex clicks work; the masked region is unhittable. */}
+      {/* 3D scene — desktop only, constrained to the right column and faded
+          at the left edge so it cannot bleed across the H1 typography.
+          Pointer events live on this layer so vertex clicks work; the masked
+          region is unhittable. On small screens the copy spans the full
+          width, so the diagram moves into the layout instead (see below). */}
       <div
-        className="absolute inset-y-0 right-0 left-0 md:left-[42%] z-0 opacity-70 md:opacity-90"
+        className="hidden md:block absolute inset-y-0 right-0 left-[42%] z-0 opacity-90"
         style={{
           WebkitMaskImage:
             "linear-gradient(to right, transparent 0%, black 18%, black 100%)",
@@ -131,6 +87,23 @@ export function HeroSection({
         </motion.div>
       )}
 
+      {/* The WebGL vertices cannot take keyboard focus, so the same four
+          actions exist as buttons — hidden until a keyboard user tabs in. */}
+      <div className="hidden md:block absolute bottom-44 right-8 z-20">
+        <div className="sr-only focus-within:not-sr-only flex gap-2">
+          {PILLARS.map((p) => (
+            <button
+              key={p}
+              type="button"
+              onClick={() => setFocusedPillar(p)}
+              className="label-mono uppercase rounded-full border border-hairline bg-[var(--background)] px-3 py-1.5"
+            >
+              {PILLAR_LABEL[p]}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Hairline grid overlay */}
       <svg
         aria-hidden
@@ -152,20 +125,31 @@ export function HeroSection({
       <div className="container-edit relative z-10 min-h-[100svh] flex flex-col justify-between pt-32 pb-12 pointer-events-none">
         {/* Top eyebrow — index left, availability right */}
         <motion.div
+          data-reveal
           {...fade}
           transition={{ duration: 1, delay: 0.2 }}
           className="flex items-start justify-between gap-6 pointer-events-auto"
         >
-          <div className="section-tag">
+          <div className="section-tag whitespace-nowrap">
             <span>(Index ／ 01)</span>
           </div>
-          <div className="hidden md:flex items-center gap-2 label-mono text-[var(--ink-muted)]">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inset-0 rounded-full bg-[var(--accent)] animate-ping opacity-60" />
-              <span className="relative inline-block h-2 w-2 rounded-full bg-[var(--accent)]" />
+          {/* Where the business lives. This site is the person; client
+              builds and the company record are on the Portforge site. */}
+          <a
+            href={siteConfig.portforge.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="link-edit label-mono whitespace-nowrap text-[var(--ink-muted)] hover:text-[var(--foreground)]"
+          >
+            <span>
+              Founder,{" "}
+              <span className="text-[var(--foreground)]">
+                Portforge
+                <span className="hidden sm:inline"> Technologies</span>
+              </span>
             </span>
-            <span className="text-[var(--foreground)]">Available now</span>
-          </div>
+            <span aria-hidden>↗</span>
+          </a>
         </motion.div>
 
         {/* Center: massive editorial type. Only the col-span-7 text column
@@ -174,9 +158,20 @@ export function HeroSection({
         <div className="relative flex-1 flex items-center">
           <div className="w-full grid md:grid-cols-12 items-center gap-6">
             <div className="md:col-span-7 pointer-events-auto">
+              {/* Small screens: the diagram sits in the flow, top-right of
+                  the copy, so it never sits behind the paragraph. */}
+              <div className="md:hidden flex justify-end mt-4 mb-2 text-[var(--foreground)]">
+                <PillarDiagram
+                  compact
+                  onVertexClick={setFocusedPillar}
+                  className="h-32 w-40"
+                />
+              </div>
+
               {/* Pillar eyebrow — demoted from accent to muted ink. The
                   tetrahedron carries the accent for this concept now. */}
               <motion.p
+                data-reveal
                 {...fade}
                 transition={{ duration: 1, delay: 0.25 }}
                 className="label-mono text-[var(--ink-muted)] mb-5 flex flex-wrap items-center gap-x-2 gap-y-1"
@@ -192,12 +187,14 @@ export function HeroSection({
               </motion.p>
 
               <motion.h1
+                data-reveal
                 className="display-mega font-display"
                 {...fade}
                 transition={{ duration: 1.2, delay: 0.3 }}
               >
                 <span className="block overflow-hidden">
                   <motion.span
+                    data-reveal
                     className="block"
                     initial={reducedMotion ? false : { y: "110%" }}
                     animate={{ y: 0 }}
@@ -208,6 +205,7 @@ export function HeroSection({
                 </span>
                 <span className="block overflow-hidden">
                   <motion.span
+                    data-reveal
                     className="block italic accent-text"
                     initial={reducedMotion ? false : { y: "110%" }}
                     animate={{ y: 0 }}
@@ -219,15 +217,16 @@ export function HeroSection({
               </motion.h1>
 
               <motion.div
+                data-reveal
                 {...fade}
                 transition={{ duration: 1, delay: 1 }}
                 className="mt-8 max-w-xl"
               >
                 <p className="font-sans text-base md:text-lg text-[var(--foreground)]/80 leading-relaxed">
-                  Shipping client products at GTN, running solo ventures from
-                  Ghana, and experimenting at the seam between{" "}
-                  <em className="italic-display">code and cognition</em>. Based
-                  in Bolgatanga.
+                  Software developer at Global Tech Network, founder of
+                  Portforge Technologies, and learning in public at the seam
+                  between <em className="italic-display">code and cognition</em>.
+                  Based in Bolgatanga.
                 </p>
               </motion.div>
             </div>
@@ -239,6 +238,7 @@ export function HeroSection({
 
         {/* Bottom row — re-enable events on each interactive cell */}
         <motion.div
+          data-reveal
           initial={reducedMotion ? false : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 1.2 }}
@@ -301,7 +301,7 @@ export function HeroSection({
 
       <PillarOverlay
         pillar={focusedPillar}
-        entries={overlayEntries}
+        entries={PILLAR_ENTRIES}
         onClose={() => setFocusedPillar(null)}
       />
     </section>

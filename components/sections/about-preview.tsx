@@ -5,6 +5,15 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { Reveal, RevealText } from "@/components/ui/reveal";
 
+// Every figure traces to the CV or to a running product. Context goes in the
+// label so a number never stands on its own.
+const STATS = [
+  { value: "5+", label: "Years shipping production software" },
+  { value: "15K+", label: "Active users on a news aggregator I built at Turntabl" },
+  { value: "2", label: "Products run by Portforge — one live, one in early access" },
+  { value: "1", label: "Separate venture in early beta — Wayve" },
+];
+
 export function AboutPreview() {
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
@@ -51,34 +60,18 @@ export function AboutPreview() {
           <div className="md:col-span-7">
             <RevealText
               className="font-display text-2xl md:text-3xl lg:text-4xl leading-tight"
-              text="I design and ship resilient systems — from payment platforms moving real money to microservice trading engines and HR tools. I care about clean architecture, small surface areas, and code that quietly survives."
+              text="I design and ship resilient systems — payment flows that move real money, a microservice trading engine, operational software for importers and retailers. I care about clean architecture, small surface areas, and code that quietly survives."
             />
 
             <Reveal delay={0.4} className="mt-12 grid grid-cols-2 gap-6 max-w-xl">
-              <div>
-                <p className="display-lg font-display">4+</p>
-                <p className="label-mono text-[var(--muted-foreground)] mt-1">
-                  Years shipping production software
-                </p>
-              </div>
-              <div>
-                <p className="display-lg font-display">15K+</p>
-                <p className="label-mono text-[var(--muted-foreground)] mt-1">
-                  Users served by systems I&rsquo;ve built
-                </p>
-              </div>
-              <div>
-                <p className="display-lg font-display">3</p>
-                <p className="label-mono text-[var(--muted-foreground)] mt-1">
-                  Solo ventures shipped &mdash; in production
-                </p>
-              </div>
-              <div>
-                <p className="display-lg font-display">48h</p>
-                <p className="label-mono text-[var(--muted-foreground)] mt-1">
-                  Door-to-door GearDockGH delivery in Bolgatanga
-                </p>
-              </div>
+              {STATS.map((stat) => (
+                <div key={stat.label}>
+                  <p className="display-lg font-display">{stat.value}</p>
+                  <p className="label-mono text-[var(--muted-foreground)] mt-1">
+                    {stat.label}
+                  </p>
+                </div>
+              ))}
             </Reveal>
           </div>
         </div>

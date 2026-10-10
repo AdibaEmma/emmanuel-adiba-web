@@ -4,26 +4,21 @@ import { MarqueeStrip } from "@/components/sections/marquee-strip";
 import { AboutPreview } from "@/components/sections/about-preview";
 import { WorkSection } from "@/components/sections/work";
 import { PillarLog } from "@/components/sections/pillar-log";
-import { ExperienceSection } from "@/components/sections/experience";
+import { ExperienceSummary } from "@/components/sections/experience-summary";
 import { CTASection } from "@/components/sections/cta";
 import { Footer } from "@/components/layout/footer";
-import { fetchEngineerEntry } from "@/lib/github";
 
-export default async function Home() {
-  // Fetch once at the page boundary so both the hero overlay (interactive
-  // tetrahedron) and the Pillar Log section share the same ISR-cached entry.
-  const engineer = await fetchEngineerEntry();
-
+export default function Home() {
   return (
     <>
       <Navbar />
       <main className="relative">
-        <HeroSection engineerEntry={engineer} />
+        <HeroSection />
         <MarqueeStrip />
         <AboutPreview />
         <WorkSection />
-        <PillarLog engineer={engineer} />
-        <ExperienceSection />
+        <PillarLog />
+        <ExperienceSummary />
         <CTASection />
       </main>
       <Footer />

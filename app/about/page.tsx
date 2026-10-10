@@ -7,7 +7,8 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Emmanuel Adiba — fullstack engineer building resilient systems with care.",
+    "Emmanuel Adiba — software engineer in Bolgatanga, Ghana. Four pillars, the full path from Turntabl to Global Tech Network, and Portforge Technologies.",
+  alternates: { canonical: "/about" },
 };
 
 export default function AboutPage() {

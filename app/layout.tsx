@@ -28,6 +28,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
+  alternates: { canonical: "/" },
   title: {
     default: `${siteConfig.name} — ${siteConfig.title}`,
     template: `%s · ${siteConfig.name}`,
@@ -40,7 +42,8 @@ export const metadata: Metadata = {
     "ML/AI",
     "React",
     "Next.js",
-    "Three.js",
+    "Portforge Technologies",
+    "Bolgatanga",
     "Distributed Systems",
   ],
   authors: [{ name: siteConfig.name }],
@@ -48,14 +51,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: siteConfig.url,
-    title: siteConfig.name,
+    url: "/",
+    title: `${siteConfig.name} — ${siteConfig.title}`,
     description: siteConfig.description,
     siteName: siteConfig.name,
   },
   twitter: {
     card: "summary_large_image",
-    title: siteConfig.name,
+    title: `${siteConfig.name} — ${siteConfig.title}`,
     description: siteConfig.description,
     creator: "@emmanuel_adiba",
   },
@@ -69,6 +72,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Without JavaScript nothing animates in, so nothing may start
+            hidden. Pairs with data-reveal in components/ui/reveal.tsx. */}
+        <noscript>
+          <style>{`[data-reveal]{opacity:1!important;transform:none!important}`}</style>
+        </noscript>
+      </head>
       <body
         className={`${fraunces.variable} ${geist.variable} ${geistMono.variable} antialiased`}
       >

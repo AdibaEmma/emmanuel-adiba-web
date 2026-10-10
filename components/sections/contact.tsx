@@ -1,41 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
 import { siteConfig } from "@/lib/constants";
 import { Reveal } from "@/components/ui/reveal";
-import { Magnetic } from "@/components/ui/magnetic";
-
-type Status = { type: "success" | "error" | null; message: string };
+import { ContactForm } from "@/components/sections/contact-form";
 
 export function ContactSection() {
-  const [data, setData] = useState({ name: "", email: "", subject: "", message: "" });
-  const [submitting, setSubmitting] = useState(false);
-  const [status, setStatus] = useState<Status>({ type: null, message: "" });
-
-  const handle = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-    setData({ ...data, [e.target.name]: e.target.value });
-
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSubmitting(true);
-    setStatus({ type: null, message: "" });
-    try {
-      const r = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (!r.ok) throw new Error();
-      setStatus({ type: "success", message: "Sent. I&rsquo;ll reply within 48 hours." });
-      setData({ name: "", email: "", subject: "", message: "" });
-    } catch {
-      setStatus({ type: "error", message: "Something failed. Try again or email me directly." });
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   return (
     <section className="relative pt-24 pb-32 overflow-hidden">
       <div className="hero-glow" aria-hidden />
@@ -43,7 +12,7 @@ export function ContactSection() {
       <div className="container-edit relative">
         <div className="flex items-baseline justify-between mb-12">
           <p className="section-tag">(Inbox ／ 05)</p>
-          <p className="eyebrow hidden md:block">— Slot open · Q3</p>
+          <p className="eyebrow hidden md:block">— Replies within 48 hours</p>
         </div>
 
         <Reveal>
@@ -56,8 +25,26 @@ export function ContactSection() {
 
         <Reveal delay={0.05}>
           <p className="mt-6 max-w-xl font-display text-xl md:text-2xl text-[var(--foreground)]/80 leading-snug">
-            Open to engineering work, build collabs, ML experiments, and venture
-            conversations. <span className="italic accent-text">One inbox.</span>
+            Open to engineering roles, collaborations and ML conversations.{" "}
+            <span className="italic accent-text">One inbox.</span>
+          </p>
+        </Reveal>
+
+        {/* Personal vs business: the two sites answer different enquiries,
+            on different terms, and the visitor should know which is which. */}
+        <Reveal delay={0.1}>
+          <p className="mt-6 max-w-xl text-base md:text-lg text-[var(--ink-secondary)]">
+            Need software built for your business? Client builds run through{" "}
+            <a
+              href={`${siteConfig.portforge.url}/contact`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="link-edit text-[var(--foreground)]"
+            >
+              {siteConfig.portforge.name}
+            </a>{" "}
+            — it gives an initial assessment within one working day. This page
+            is for everything else.
           </p>
         </Reveal>
 
@@ -72,7 +59,7 @@ export function ContactSection() {
               <li>· Greenfield products from zero → live</li>
               <li>· Fintech, payments, KYC &amp; trading systems</li>
               <li>· Rescuing scope-creep codebases</li>
-              <li>· Embedded engineering for small teams</li>
+              <li>· Remote engineering roles on product teams</li>
             </ul>
           </div>
           <div className="bg-[var(--background)] p-6 md:p-8">
@@ -81,10 +68,9 @@ export function ContactSection() {
             </p>
             <ul className="space-y-2 font-display text-xl md:text-2xl leading-snug text-[var(--ink-secondary)]">
               <li>· A logo / brand designer</li>
-              <li>· A part-time contractor &lt; 4 weeks</li>
+              <li>· A part-time contractor for under 4 weeks</li>
               <li>· A Wordpress / Shopify dev</li>
               <li>· Available for crypto-only projects</li>
-              <li>· Booked through end of Q2 — replies slow</li>
             </ul>
           </div>
         </Reveal>
@@ -146,125 +132,11 @@ export function ContactSection() {
           </div>
 
           {/* Form */}
-          <Reveal delay={0.2} className="lg:col-span-8">
-            <form onSubmit={submit} className="space-y-8">
-              <div className="grid sm:grid-cols-2 gap-8">
-                <Field
-                  label="01 — Name"
-                  name="name"
-                  value={data.name}
-                  onChange={handle}
-                  placeholder="Your name"
-                  required
-                />
-                <Field
-                  label="02 — Email"
-                  name="email"
-                  type="email"
-                  value={data.email}
-                  onChange={handle}
-                  placeholder="hello@domain.com"
-                  required
-                />
-              </div>
-              <Field
-                label="03 — Subject"
-                name="subject"
-                value={data.subject}
-                onChange={handle}
-                placeholder="What&rsquo;s this about"
-                required
-              />
-              <Field
-                label="04 — Brief"
-                name="message"
-                value={data.message}
-                onChange={handle}
-                placeholder="Tell me about the work"
-                required
-                textarea
-              />
-
-              {status.type && (
-                <motion.p
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={
-                    status.type === "success"
-                      ? "label-mono accent-text"
-                      : "label-mono text-red-500"
-                  }
-                >
-                  {status.message}
-                </motion.p>
-              )}
-
-              <div className="pt-4 border-t border-hairline flex items-center justify-between">
-                <p className="label-mono text-[var(--muted-foreground)]">
-                  ※ I respond within 48 hours
-                </p>
-                <Magnetic strength={0.25}>
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="btn-magnetic btn-magnetic--primary disabled:opacity-50"
-                  >
-                    <span>{submitting ? "Transmitting…" : "Transmit"}</span>
-                    <span aria-hidden>{submitting ? "⟳" : "→"}</span>
-                  </button>
-                </Magnetic>
-              </div>
-            </form>
+          <Reveal delay={0.2} className="lg:col-span-8 relative">
+            <ContactForm />
           </Reveal>
         </div>
       </div>
     </section>
-  );
-}
-
-function Field({
-  label,
-  name,
-  value,
-  onChange,
-  placeholder,
-  required,
-  type = "text",
-  textarea,
-}: {
-  label: string;
-  name: string;
-  value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  placeholder?: string;
-  required?: boolean;
-  type?: string;
-  textarea?: boolean;
-}) {
-  return (
-    <label className="block group">
-      <span className="eyebrow block mb-3">{label}</span>
-      {textarea ? (
-        <textarea
-          name={name}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          required={required}
-          rows={6}
-          className="w-full bg-transparent border-b border-hairline pb-3 text-xl md:text-2xl font-display focus:outline-none focus:border-[var(--accent)] transition-colors placeholder:text-[var(--muted-foreground)]/50 resize-none"
-        />
-      ) : (
-        <input
-          type={type}
-          name={name}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          required={required}
-          className="w-full bg-transparent border-b border-hairline pb-3 text-xl md:text-2xl font-display focus:outline-none focus:border-[var(--accent)] transition-colors placeholder:text-[var(--muted-foreground)]/50"
-        />
-      )}
-    </label>
   );
 }

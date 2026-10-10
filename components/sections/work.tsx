@@ -30,11 +30,16 @@ function ProjectRow({
   index: number;
   onEnter: (p: Project) => void;
 }) {
+  // Public work opens its own site; private client work goes to its card on
+  // /projects, which explains why there is nothing to open.
+  const external = project.link;
+  const linkProps = external
+    ? { href: external.href, target: "_blank", rel: "noopener noreferrer" }
+    : { href: `/projects#${project.id}` };
+
   return (
     <motion.a
-      href={project.liveUrl || project.githubUrl || "/projects"}
-      target={project.liveUrl ? "_blank" : undefined}
-      rel="noopener noreferrer"
+      {...linkProps}
       onMouseEnter={() => onEnter(project)}
       onFocus={() => onEnter(project)}
       className="group relative grid grid-cols-12 items-baseline gap-4 py-8 md:py-10 border-t border-hairline last:border-b cursor-pointer"
@@ -60,9 +65,12 @@ function ProjectRow({
         </p>
       </div>
 
-      <div className="hidden md:flex md:col-span-3 items-center gap-2">
+      <div className="hidden md:flex md:col-span-3 flex-col gap-1">
         <span className="label-mono accent-text uppercase tracking-[0.18em]">
           {pillarUppercase(project.pillars[0])}
+        </span>
+        <span className="label-mono text-[var(--ink-muted)]">
+          {project.status}
         </span>
       </div>
 
@@ -71,7 +79,7 @@ function ProjectRow({
           {project.role}
         </span>
         <motion.span
-          variants={{ hover: { rotate: -45, color: "var(--accent)" } }}
+          variants={{ hover: { rotate: external ? -45 : 0, color: "var(--accent)" } }}
           transition={{ duration: 0.4 }}
           className="inline-block text-2xl"
           aria-hidden
@@ -80,8 +88,12 @@ function ProjectRow({
         </motion.span>
       </div>
 
-      <p className="col-span-12 md:col-start-2 md:col-span-9 mt-3 text-[var(--ink-muted)] text-sm md:text-base max-w-2xl">
-        {project.description}
+      <p className="col-span-12 md:col-start-2 md:col-span-9 mt-3 text-[var(--ink-secondary)] text-sm md:text-base max-w-2xl">
+        {project.impact}
+      </p>
+      <p className="col-span-12 md:col-start-2 md:col-span-9 label-mono text-[var(--ink-muted)]">
+        {external ? `↗ ${external.label}` : "Details on the projects page"}
+        {project.venture ? ` · ${project.venture}` : ""}
       </p>
     </motion.a>
   );
@@ -199,11 +211,11 @@ function FloatingPreview({
                   {project.role}
                 </span>
                 <span className="accent-text shrink-0">
-                  ↗ {project.liveUrl ? "open" : "view"}
+                  {project.link ? `↗ ${project.link.label}` : project.status}
                 </span>
               </div>
               <p className="font-display italic text-sm text-[var(--ink-secondary)] mt-1 truncate">
-                {project.impact}
+                {project.tagline}
               </p>
             </div>
           </div>
@@ -226,7 +238,7 @@ export function WorkSection() {
         <div className="flex items-baseline justify-between mb-12 md:mb-20">
           <p className="section-tag">(Selected ／ 03)</p>
           <p className="eyebrow hidden md:block">
-            — {featured.length} entries · hover any row
+            — {featured.length} entries
           </p>
         </div>
 

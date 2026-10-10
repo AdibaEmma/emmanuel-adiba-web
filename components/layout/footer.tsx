@@ -13,6 +13,7 @@ export function Footer() {
     { label: "LinkedIn", href: siteConfig.social.linkedin },
     { label: "Twitter / X", href: siteConfig.social.twitter },
     { label: "Email", href: `mailto:${siteConfig.email}` },
+    { label: "Portforge", href: siteConfig.portforge.url },
   ];
 
   return (
@@ -37,7 +38,7 @@ export function Footer() {
         <Marquee
           items={[
             <span key="a" className="font-display italic text-3xl md:text-5xl">
-              available now
+              open to new roles
             </span>,
             <span key="b" className="font-display text-3xl md:text-5xl">
               {siteConfig.email}
@@ -59,7 +60,15 @@ export function Footer() {
             Emmanuel Adiba
             <br />
             <span className="text-[var(--ink-secondary)] text-base">
-              Software Engineer
+              Software Engineer · Founder,{" "}
+              <a
+                href={siteConfig.portforge.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link-edit"
+              >
+                {siteConfig.portforge.name}
+              </a>
             </span>
           </p>
         </div>
@@ -82,6 +91,7 @@ export function Footer() {
             <li><Link href="/projects" className="link-edit">Work</Link></li>
             <li><Link href="/ml-ai" className="link-edit">ML / AI</Link></li>
             <li><Link href="/now" className="link-edit">Now</Link></li>
+            <li><Link href="/contact" className="link-edit">Contact</Link></li>
           </ul>
         </div>
 
@@ -102,7 +112,7 @@ export function Footer() {
             ))}
             <li>
               <a
-                href="https://github.com/AdibaEmma/AdibaEmma.github.io"
+                href={siteConfig.sourceUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="link-edit"

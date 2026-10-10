@@ -1,28 +1,13 @@
 import Link from 'next/link'
 import { PILLARS, pillarUppercase } from '@/lib/brand'
-import {
-  PILLAR_ENTRIES,
-  timeAgo,
-  type PillarEntry,
-} from '@/lib/pillar-log'
+import { PILLAR_ENTRIES, formatMonth } from '@/lib/pillar-log'
 
 /**
- * Pillar Log — live evidence for each of the four pillars.
- *
- * The Engineer entry is fetched once in the page server component (for ISR
- * caching) and passed down. The other three are authored in
- * `lib/pillar-log.ts`. Together they replace the "trust me" version of the
+ * Pillar Log — the latest evidence for each of the four pillars, authored
+ * in `lib/pillar-log.ts`. Together they replace the "trust me" version of the
  * four-pillar identity with a dated artifact per pillar.
  */
-export function PillarLog({ engineer }: { engineer: PillarEntry }) {
-  const nowIso = new Date().toISOString()
-
-  const entries: Record<(typeof PILLARS)[number], PillarEntry> = {
-    engineer,
-    builder: PILLAR_ENTRIES.builder,
-    thinker: PILLAR_ENTRIES.thinker,
-    founder: PILLAR_ENTRIES.founder,
-  }
+export function PillarLog() {
 
   return (
     <section
@@ -34,11 +19,7 @@ export function PillarLog({ engineer }: { engineer: PillarEntry }) {
         <div className="flex items-baseline justify-between mb-12 md:mb-16">
           <p className="section-tag">(Pillar Log ／ 04)</p>
           <p className="eyebrow hidden md:flex items-center gap-2">
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inset-0 rounded-full bg-[var(--accent)] animate-ping opacity-60" />
-              <span className="relative inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
-            </span>
-            <span>— Live · refreshed hourly</span>
+            <span>— Dated · updated as milestones land</span>
           </p>
         </div>
 
@@ -47,18 +28,18 @@ export function PillarLog({ engineer }: { engineer: PillarEntry }) {
             Four pillars.{' '}
             <span className="italic accent-text">Four artifacts</span>,
             <br />
-            dated and current.
+            each one dated.
           </h2>
           <p className="mt-6 text-base md:text-lg text-[var(--ink-muted)] max-w-xl">
-            Most portfolios claim. This one shows the most recent shipped commit,
-            experiment, note, and venture milestone — refreshed at the edge.
+            Most portfolios claim. This one shows the most recent piece of
+            client work, side build, experiment and venture milestone — with
+            the month it happened, so you can judge how fresh it is.
           </p>
         </div>
 
         <ul className="grid grid-cols-1 md:grid-cols-2 gap-px bg-[var(--rule)] border border-hairline">
           {PILLARS.map((p, i) => {
-            const entry = entries[p]
-            const ago = timeAgo(entry.date, nowIso)
+            const entry = PILLAR_ENTRIES[p]
             const isExternal = entry.href?.startsWith('http')
             return (
               <li
@@ -72,9 +53,9 @@ export function PillarLog({ engineer }: { engineer: PillarEntry }) {
                       {pillarUppercase(p)}
                     </span>
                   </span>
-                  <span className="label-mono text-[var(--ink-muted)]">
-                    {ago}
-                  </span>
+                  <time dateTime={entry.date} className="label-mono text-[var(--ink-muted)]">
+                    {formatMonth(entry.date)}
+                  </time>
                 </div>
 
                 <h3 className="font-display text-2xl md:text-3xl leading-tight text-[var(--foreground)]">
@@ -113,11 +94,6 @@ export function PillarLog({ engineer }: { engineer: PillarEntry }) {
           })}
         </ul>
 
-        <p className="mt-8 label-mono text-[var(--ink-muted)] max-w-2xl">
-          The engineer cell calls the public GitHub events API on the server
-          (cached at the edge). The other three are authored manually as
-          milestones land.
-        </p>
       </div>
     </section>
   )

@@ -30,7 +30,7 @@ export const PILLAR_LABEL: Record<Pillar, string> = {
  */
 export const PILLAR_TAGLINE: Record<Pillar, string> = {
   engineer: 'Client work at GTN.',
-  builder: 'Experiments and side builds.',
+  builder: 'Side builds, unreleased.',
   thinker: 'The ML/AI lab.',
   founder: 'Ventures with users and revenue intent.',
 }
@@ -38,37 +38,35 @@ export const PILLAR_TAGLINE: Record<Pillar, string> = {
 /** Longer beat description for the about page. */
 export const PILLAR_DESCRIPTION: Record<Pillar, string> = {
   engineer:
-    'Lead engineer at GTN LLC — NestJS, Laravel, React Native, Stripe Connect, ACH, Prisma, PostgreSQL. I ship Vacation Branson and iTargetGolf as client products, and collaborate on Compliance Scorecard. The job is to make complex payment and operational systems feel quiet and inevitable.',
+    'Software developer at Global Tech Network, a US software firm, working remotely from Bolgatanga. Laravel, React, NestJS and Stripe Connect on client products — Vacation Branson, iTargetGolf, Fortiffi and Compliance Scorecard. The job is to make complex payment and operational systems feel quiet and inevitable.',
   builder:
-    "What I build when no one's asking. BookLoop, ZCTL, SlamPact — small experiments without a venture attached. Done for the craft, for a question I want to answer, for a primitive I want to feel in my hands.",
+    'What I build when no one is asking. BookLoop and SlamPact are complete enough to run and have not been launched — each one a question about a market I wanted to answer in code before answering it with money.',
   thinker:
-    "The lab. Vector search for semantic resume parsing, fine-tuning Llama on Stoic philosophy, behavioral economics applied to payment UX, Bayesian personal forecasting. The seam between deterministic systems and the messy logic of human decision-making — that's where I keep returning.",
+    'The lab, early. Working through machine-learning problems end to end — classification, then regression — and writing down what I understand and what I do not yet. The seam between deterministic systems and the messy logic of human decision-making is where I keep returning.',
   founder:
-    'Ventures with users and revenue intent. GearDockGH ships premium imported gear into Ghana on infrastructure I run myself. ImportBrain is the operating system for the country’s mini-importers. Wayve is the AI-powered Ghana travel platform I co-founded as CTO at Zurelix Limited.',
+    'Ventures with users and revenue intent. Portforge Technologies, my registered business in Bolgatanga, runs GearDockGH — technology retail for the Upper East — and ImportBrain, landed-cost software for importers. Wayve, a group-trip platform for Ghana, is a separate venture.',
 }
 
 /** Bullet points used on /about under each pillar — concrete proof. */
 export const PILLAR_BULLETS: Record<Pillar, string[]> = {
   engineer: [
-    'GTN — Vacation Branson · iTargetGolf · Compliance Scorecard',
-    'Stack — NestJS, Laravel, React Native, Prisma, PostgreSQL',
-    'Crafting — payments (Stripe Connect, ACH), MCP servers, real-time UX',
+    'GTN — Vacation Branson · iTargetGolf · Fortiffi · Compliance Scorecard',
+    'Stack — Laravel, React, NestJS, MySQL, PostgreSQL',
+    'Focus — payments (Stripe Connect, ACH), MCP servers, real-time UX',
   ],
   builder: [
-    'BookLoop — peer-to-peer book lending with DMs',
-    'ZCTL — zero-config CLI tooling experiments',
-    'SlamPact — group goal-setting with social stakes',
+    'BookLoop — book exchange for Ghana, source on GitHub',
+    'SlamPact — reviews that turn into donations, unreleased',
   ],
   thinker: [
-    'Vector search for semantic resume parsing',
-    'Fine-tuning Llama on Stoic philosophy',
-    'Bayesian models for personal forecasting',
-    'Behavioral economics in payment UX',
+    'Titanic survival — binary classification, Kaggle',
+    'House prices — leak-free regression pipeline, Kaggle',
+    'Planned: vector search, LLM tooling, behavioural economics in payment UX',
   ],
   founder: [
-    'GearDockGH — Ghana e-commerce, in production on Hetzner',
-    'ImportBrain — SaaS for mini-importers',
-    'Wayve — AI travel platform · co-founder & CTO at Zurelix Limited',
+    'Portforge Technologies — registered business, Bolgatanga',
+    'GearDockGH — live · ImportBrain — early access',
+    'Wayve — separate venture, early beta',
   ],
 }
 

@@ -13,7 +13,7 @@ export function CTASection() {
       <div className="container-edit relative">
         <div className="flex items-baseline justify-between mb-12">
           <p className="section-tag">(Contact ／ 06)</p>
-          <p className="eyebrow hidden md:block">— Inbox open</p>
+          <p className="eyebrow hidden md:block">— Open to new roles</p>
         </div>
 
         <Reveal>
@@ -28,8 +28,17 @@ export function CTASection() {
 
         <Reveal delay={0.2} className="mt-12 max-w-xl">
           <p className="text-lg text-[var(--foreground)]/75">
-            I take on a small number of engagements per quarter — engineering
-            for teams that care about the details.
+            Open to engineering roles and collaborations — write to me
+            directly. Building software for a business? That runs through{" "}
+            <a
+              href={siteConfig.portforge.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="link-edit text-[var(--foreground)]"
+            >
+              {siteConfig.portforge.name}
+            </a>
+            .
           </p>
         </Reveal>
 

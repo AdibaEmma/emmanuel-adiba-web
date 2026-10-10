@@ -6,7 +6,8 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Contact",
   description:
-    "Get in touch with Emmanuel Adiba for engineering engagements and collaborations.",
+    "Contact Emmanuel Adiba about engineering roles and collaborations. Business software enquiries go to Portforge Technologies.",
+  alternates: { canonical: "/contact" },
 };
 
 export default function ContactPage() {

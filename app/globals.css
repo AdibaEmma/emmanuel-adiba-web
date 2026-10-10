@@ -44,11 +44,15 @@
 
   --ink-primary: #0a0b0a;
   --ink-secondary: #4a4d44;
-  --ink-muted: #6b6f63;
+  /* ≥ 4.5:1 on both --background and --bg-elevated (was 4.1:1 on elevated) */
+  --ink-muted: #5d6157;
 
-  --accent: #6b8a18;
+  /* Accent is also used for text and button fills: ≥ 4.5:1 against the
+     parchment and against its own foreground (was 3.5:1) */
+  --accent: #556b12;
   --accent-foreground: #f5f1e6;
-  --accent-glow: rgba(107, 138, 24, 0.2);
+  --accent-glow: rgba(85, 107, 18, 0.2);
+  --danger: #a3261b;
 
   --rule: rgba(10, 11, 10, 0.12);
   --rule-strong: rgba(10, 11, 10, 0.22);
@@ -65,11 +69,13 @@
 
   --ink-primary: #f5f1e6;
   --ink-secondary: #a8ab9f;
-  --ink-muted: #6b6f63;
+  /* ≥ 4.5:1 on both --background and --bg-elevated (was 3.6–3.8:1) */
+  --ink-muted: #8a8e81;
 
   --accent: #c7f65e;
   --accent-foreground: #0a0b0a;
   --accent-glow: rgba(199, 246, 94, 0.2);
+  --danger: #ff8a7a;
 
   --rule: #1e2220;
   --rule-strong: #2a2f2c;
@@ -101,6 +107,13 @@
   /* Headings sit below the floating nav when scrolled-to */
   h1, h2, h3, h4 {
     scroll-margin-top: 8rem;
+  }
+
+  /* One visible focus treatment for every interactive element. */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
   }
 
   ::selection {
@@ -325,7 +338,18 @@
     background: var(--bg-elevated);
   }
 
+  /* Keyboard focus on a diagram vertex (components/three/pillar-diagram.tsx).
+     SVG groups take no outline, so the ring is drawn instead. */
+  .pillar-vertex:focus { outline: none; }
+  .pillar-vertex__ring { stroke: transparent; stroke-width: 2; }
+  .pillar-vertex:focus-visible .pillar-vertex__ring { stroke: var(--accent); }
+
   @media (prefers-reduced-motion: reduce) {
+    /* Reveals render in place: no fade, no slide, nothing left hidden. */
+    [data-reveal] {
+      opacity: 1 !important;
+      transform: none !important;
+    }
     *, *::before, *::after {
       animation-duration: 0.01ms !important;
       animation-iteration-count: 1 !important;

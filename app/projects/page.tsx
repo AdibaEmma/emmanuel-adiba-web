@@ -5,9 +5,10 @@ import { Footer } from "@/components/layout/footer";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Work",
+  title: "Projects",
   description:
-    "Selected work by Emmanuel Adiba — fintech, trading systems, HR platforms, and microservices.",
+    "Projects by Emmanuel Adiba — Portforge's GearDockGH and ImportBrain, the Wayve venture, client work at GTN, and side builds — each with its role and current status.",
+  alternates: { canonical: "/projects" },
 };
 
 export default function ProjectsPage() {

@@ -1,17 +1,17 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
+import { AnimatePresence } from "framer-motion";
 import { projects } from "@/lib/constants";
 import {
   PILLARS,
   PILLAR_LABEL,
   PILLAR_TAGLINE,
   Pillar,
-  pillarUppercase,
 } from "@/lib/brand";
 import { Reveal } from "@/components/ui/reveal";
-import { ProjectCover } from "@/components/ui/project-cover";
+import { ProjectCard } from "@/components/sections/project-card";
 import { cn } from "@/lib/utils";
 
 type Filter = "all" | Pillar;
@@ -62,8 +62,10 @@ export function ProjectsSection() {
         <Reveal delay={0.15}>
           <p className="mt-8 max-w-xl text-[var(--foreground)]/70 text-base md:text-lg">
             Sorted by pillar, not by date. Engineer is client work at GTN.
-            Builder is exploratory. Thinker is the lab. Founder is venture work
-            with users and revenue intent. Filter to see the shape of each.
+            Builder is side builds that have not launched. Thinker is the lab.
+            Founder is venture work with users and revenue intent. Each card
+            says where it stands, and links out only when there is something
+            public to see.
           </p>
         </Reveal>
 
@@ -78,9 +80,11 @@ export function ProjectsSection() {
             return (
               <button
                 key={c}
+                type="button"
+                aria-pressed={active}
                 onClick={() => setFilter(c)}
                 className={cn(
-                  "label-mono uppercase rounded-full px-4 py-2 border transition-all flex items-center gap-2",
+                  "label-mono uppercase rounded-full px-4 min-h-11 border transition-all flex items-center gap-2",
                   active
                     ? "bg-[var(--accent)] text-[var(--accent-foreground)] border-[var(--accent)]"
                     : "border-hairline text-[var(--ink-muted)] hover:text-[var(--foreground)]",
@@ -100,7 +104,10 @@ export function ProjectsSection() {
               </button>
             );
           })}
-          <span className="label-mono ml-auto self-center text-[var(--ink-muted)]">
+          <span
+            className="label-mono w-full sm:w-auto sm:ml-auto self-center text-[var(--ink-muted)]"
+            aria-live="polite"
+          >
             ／ {filtered.length} shown
             {filter !== "all" && (
               <span className="ml-2 italic accent-text">
@@ -113,131 +120,41 @@ export function ProjectsSection() {
         {/* Editorial bento — every 3rd card spans full width for visual rhythm */}
         <div className="mt-16 grid gap-6 md:grid-cols-12">
           <AnimatePresence mode="popLayout">
-            {filtered.map((p, i) => {
-              const isWide = i % 3 === 0;
-              const span = isWide ? "md:col-span-12" : "md:col-span-6";
-              const primaryPillar = p.pillars[0];
-              return (
-                <motion.article
-                  key={p.id}
-                  layout
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  whileHover={{ y: -4 }}
-                  transition={{
-                    duration: 0.6,
-                    delay: i * 0.06,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                  className={cn(
-                    "group relative col-span-12 overflow-hidden rounded-md border border-hairline bg-[var(--bg-elevated)] hover:border-[var(--accent)] hover:shadow-2xl hover:shadow-[var(--accent-glow)] transition-[border-color,box-shadow] duration-500",
-                    span,
-                  )}
-                >
-                  <a
-                    href={p.liveUrl || p.githubUrl || "#"}
-                    target={p.liveUrl ? "_blank" : undefined}
-                    rel="noopener noreferrer"
-                    className={cn(
-                      "block",
-                      isWide ? "md:grid md:grid-cols-2 md:items-stretch" : "",
-                    )}
-                  >
-                    {/* Visual area — real screenshot OR typographic draft cover */}
-                    <div
-                      className={cn(
-                        "relative overflow-hidden",
-                        isWide ? "aspect-[16/10] md:aspect-auto md:min-h-[360px]" : "aspect-[16/10]",
-                      )}
-                    >
-                      {p.image ? (
-                        <>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={p.image}
-                            alt={p.title}
-                            className="h-full w-full object-cover object-top brightness-[0.85] saturate-90 group-hover:brightness-100 group-hover:saturate-100 group-hover:scale-[1.03] transition-all duration-700"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-[var(--background)]/60 via-transparent to-transparent" />
-                        </>
-                      ) : (
-                        <ProjectCover
-                          title={p.title}
-                          tagline={p.tagline}
-                          pillar={primaryPillar}
-                        />
-                      )}
-
-                      {/* Pillar tag — top-left, mono caps, lime */}
-                      <div className="absolute top-3 left-3 label-mono accent-text uppercase tracking-[0.18em] flex items-center gap-2">
-                        <span>●</span>
-                        <span>{pillarUppercase(primaryPillar)}</span>
-                        {p.pillars.length > 1 && (
-                          <span className="text-[var(--ink-muted)] normal-case lowercase">
-                            +{p.pillars.length - 1}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Role — top-right (replaces year) */}
-                      <div className="absolute top-3 right-3 label-mono text-[var(--foreground)] mix-blend-difference">
-                        {p.role}
-                      </div>
-
-                      {/* Reveal-on-hover metric strip */}
-                      <div className="absolute inset-x-0 bottom-0 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]">
-                        <div className="bg-[var(--accent)] text-[var(--accent-foreground)] px-4 py-2 label-mono flex items-center justify-between">
-                          <span>✶ {p.impact}</span>
-                          {p.liveUrl && <span className="opacity-70">↗ open</span>}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Copy column */}
-                    <div className="flex flex-col p-6 md:p-8 gap-4">
-                      <div className="flex items-baseline justify-between gap-4">
-                        <p className="label-mono text-[var(--ink-muted)]">
-                          {p.year}
-                        </p>
-                        <span className="label-mono accent-text">↗</span>
-                      </div>
-                      <h3 className="font-display text-3xl md:text-4xl lg:text-5xl leading-[0.95]">
-                        {p.title}
-                      </h3>
-                      <p className="font-display italic text-lg md:text-xl text-[var(--foreground)]/80">
-                        {p.tagline}
-                      </p>
-                      <p className="text-sm md:text-base text-[var(--ink-secondary)] max-w-prose">
-                        {p.description}
-                      </p>
-                      <div className="flex flex-wrap gap-1 pt-2">
-                        {p.technologies.map((t) => (
-                          <span
-                            key={t}
-                            className="label-mono px-2 py-0.5 rounded-full border border-hairline text-[var(--ink-muted)]"
-                          >
-                            {t}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="border-t border-hairline pt-3 mt-2 flex items-center justify-between">
-                        <span className="label-mono accent-text">
-                          ✶ {p.impact}
-                        </span>
-                      </div>
-                    </div>
-                  </a>
-                </motion.article>
-              );
-            })}
+            {filtered.map((p, i) => (
+              <ProjectCard key={p.id} project={p} wide={i % 3 === 0} index={i} />
+            ))}
           </AnimatePresence>
         </div>
 
-        <Reveal className="mt-20 text-center label-mono text-[var(--ink-muted)]">
-          ／ More chapters in the works · come back soon ／
-        </Reveal>
+        {filtered.length === 0 && filter !== "all" && (
+          <EmptyFilter pillar={filter} />
+        )}
+
+
       </div>
     </section>
+  );
+}
+
+/**
+ * Shown when a pillar has no project cards. Today that is Thinker, whose
+ * work is notebooks and notes rather than products, and lives on /ml-ai.
+ */
+function EmptyFilter({ pillar }: { pillar: Pillar }) {
+  return (
+    <div className="rounded-md border border-dashed border-hairline p-8 md:p-12 max-w-2xl">
+      <p className="eyebrow mb-3">({PILLAR_LABEL[pillar]} ／ no product cards)</p>
+      <p className="font-display text-2xl md:text-3xl leading-snug">
+        {pillar === "thinker"
+          ? "The thinking work is notebooks and notes, not products — so it lives on its own page."
+          : "Nothing in this pillar yet."}
+      </p>
+      {pillar === "thinker" && (
+        <Link href="/ml-ai" className="mt-6 btn-magnetic btn-magnetic--primary">
+          <span>Open the ML/AI lab</span>
+          <span aria-hidden>→</span>
+        </Link>
+      )}
+    </div>
   );
 }

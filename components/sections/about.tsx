@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
-import { aboutContent, education, skills, siteConfig } from "@/lib/constants";
+import { education, resumePath, skills, siteConfig } from "@/lib/constants";
 import {
   PILLARS,
   PILLAR_LABEL,
@@ -89,14 +89,17 @@ export function AboutSection() {
 
           <Reveal delay={0.35} className="flex flex-wrap gap-3">
             <Magnetic strength={0.2}>
-              <Link
-                href={aboutContent.resumePath}
-                download
+              {/* A plain anchor, not next/link: a PDF is not a route, and Link
+                  would prefetch it as one (an ?_rsc= request that 404s). */}
+              <a
+                href={resumePath}
+                download="Emmanuel_Adiba_CV.pdf"
                 className="btn-magnetic btn-magnetic--primary"
               >
                 <span>Download CV</span>
+                <span className="normal-case tracking-normal">(PDF)</span>
                 <span aria-hidden>↓</span>
-              </Link>
+              </a>
             </Magnetic>
             <Magnetic strength={0.2}>
               <Link href="/contact" className="btn-magnetic btn-magnetic--ghost">
