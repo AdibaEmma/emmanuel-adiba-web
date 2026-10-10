@@ -220,6 +220,21 @@ export const projects: Project[] = [
     impact: 'Client product · GTN LLC',
   },
   {
+    id: 'fortiffi',
+    title: 'Fortiffi',
+    tagline: 'Multi-tenant B2B SaaS on Stripe Connect.',
+    description:
+      'Client work at Global Tech Network on a multi-tenant B2B platform — bookings, contractor payouts, affiliate partners, onboarding and team messaging — on Laravel 10 with Stripe Connect. Refactored its 1,600-line Stripe payment service into single-responsibility services, with idempotent transfers, retries with backoff, and deposits that hold affiliate transfers until the final payment.',
+    technologies: ['Laravel', 'PHP', 'Stripe Connect', 'Pusher', 'Twilio'],
+    pillars: ['engineer'],
+    role: 'Engineer at GTN',
+    year: '2025',
+    status: 'Client product · not publicly linked',
+    image: '',
+    featured: false,
+    impact: 'Client product · GTN LLC',
+  },
+  {
     id: 'compliance-scorecard',
     title: 'Compliance Scorecard',
     tagline: 'Governance software for MSPs.',
